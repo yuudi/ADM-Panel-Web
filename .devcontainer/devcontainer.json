@@ -1,0 +1,5 @@
+// For format details, see https://aka.ms/devcontainer.json.
+{
+	"name": "ADM-Panel - Angular",
+	"image": "mcr.microsoft.com/devcontainers/javascript-node:18"
+}
