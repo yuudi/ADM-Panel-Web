@@ -19,15 +19,29 @@ type LoginResponse = {
 export class LoginService {
   constructor(private http: HttpClient) {}
 
-  public isLogin(): boolean {
+  public hasLoginCookie(): boolean {
     return this.checkHttpOnlyCookieExists('adm-token');
+  }
+
+  public isLoggedIn(): Observable<boolean> {
+    return new Observable<boolean>((observer) => {
+      if (this.hasLoginCookie()) {
+        this.testLoginPing().subscribe((result) => {
+          observer.next(result);
+          observer.complete();
+        });
+      } else {
+        observer.next(false);
+        observer.complete();
+      }
+    });
   }
 
   checkHttpOnlyCookieExists(cookieName: string): boolean {
     const tmpTimeMs = new Date().getTime() + 1000;
     const tmpTime = new Date(tmpTimeMs).toUTCString();
     document.cookie = `${cookieName}=1; expires=${tmpTime}; path=/`;
-    return document.cookie.indexOf(cookieName) !== -1;
+    return document.cookie.indexOf(cookieName) === -1;
   }
 
   testLoginPing(): Observable<boolean> {
@@ -40,7 +54,8 @@ export class LoginService {
           const result = response.status === 200;
           observer.next(result);
           observer.complete();
-        });
+        })
+        
     });
   }
 
