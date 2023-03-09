@@ -10,6 +10,7 @@ import { LoginService } from '../login.service';
 export class LoginComponent implements OnInit {
   username = '';
   password = '';
+  passwordError = false;
 
   constructor(
     private loginService: LoginService,
@@ -22,7 +23,7 @@ export class LoginComponent implements OnInit {
       if (result) {
         this.redirect();
       } else {
-        // this.login();
+        // stay in login page
       }
     });
   }
@@ -30,16 +31,22 @@ export class LoginComponent implements OnInit {
   login() {
     this.loginService
       .requestLogin(this.username, this.password)
-      .subscribe((result) => {
-        if (result) {
+      .subscribe(([loginSuccess, message]) => {
+        if (loginSuccess) {
           this.redirect();
+        } else {
+          this.passwordError = true;
+          window.alert("password and username don't match"); //TODO: use snackbar
         }
       });
   }
 
   redirect() {
-    const redirectTo =
-      this.route.snapshot.queryParams['redirect'] || '/overview';
+    const redirectTo = this.route.snapshot.queryParams['redirect'];
+    if (redirectTo === undefined || redirectTo === '/login') {
+      this.router.navigate(['/overview']);
+      return;
+    }
     this.router.navigate([redirectTo]);
   }
 
